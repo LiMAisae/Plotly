@@ -47,6 +47,6 @@ Daily confirmed cases and deaths:
 ```{r, echo=FALSE}
 fig2 <- plot_ly( x=data_fr$dateRep,y=data_fr$cases, type = 'bar', name = 'New confirmed cases',width = 800, height = 500) %>%
         add_trace(y = data_fr$deaths, type = 'bar',name = 'New deaths') %>% 
-        layout( barmode = 'stack')%>%layout(title ="Daily confirmend cases and deaths in France from 27/02/2020")
+        layout( barmode = 'stack')%>%layout(title ="Daily confirmed cases and deaths in France from 27/02/2020")
 fig2
 ```
