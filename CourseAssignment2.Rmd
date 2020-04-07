@@ -1,0 +1,52 @@
+---
+title: "Evolution of Covid-19 infected cases in France"
+author: "Li"
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Description
+This page presents the evolution of Covid-19 infected cases in France. The data from 27/02/2020 are plotted, including the new confirmed infected cases and deaths each day as well as the total cases.  Data are extracted from the site [Open Data of European Centre for Disease Prevention and Control](https://opendata.ecdc.europa.eu/covid19/casedistribution/csv).
+
+```{r, echo=FALSE, message=FALSE}
+library(dplyr)
+library(plotly)
+
+tf<-tempfile()
+download.file("https://opendata.ecdc.europa.eu/covid19/casedistribution/csv",tf)
+data <- read.csv(tf)
+unlink(tf)
+
+
+
+columns <- c('dateRep','countriesAndTerritories', 'cases', 'deaths')
+
+data <- data[columns]
+data$dateRep<-as.Date(data$dateRep, format = "%d/%m/%Y")
+data_fr<-data%>%
+        filter(countriesAndTerritories=='France')%>%
+        filter(dateRep>=as.Date('27/02/2020',format="%d/%m/%Y"))
+data_fr$cum_cases <-rev(cumsum(rev(data_fr$cases )))
+data_fr$cum_deaths <-rev(cumsum(rev(data_fr$deaths )))
+```
+## Including Plots
+Total confirmed cases and deaths:
+```{r, echo=FALSE}
+fig0 <-plot_ly(x=data_fr$dateRep,y=data_fr$cum_cases,type = 'scatter', mode = 'lines',name = "Total confirmed cases",width = 800, height = 500 )%>%
+  add_trace(x=data_fr$dateRep,y=data_fr$cum_deaths,type = 'scatter', mode = 'lines',name = "Total deaths")%>%
+  layout(title ="Total confirmed cases and deaths in France from 27/02/2020")
+fig0
+```
+
+
+Daily confirmed cases and deaths:
+```{r, echo=FALSE}
+fig2 <- plot_ly( x=data_fr$dateRep,y=data_fr$cases, type = 'bar', name = 'New confirmed cases',width = 800, height = 500) %>%
+        add_trace(y = data_fr$deaths, type = 'bar',name = 'New deaths') %>% 
+        layout( barmode = 'stack')%>%layout(title ="Daily confirmend cases and deaths in France from 27/02/2020")
+fig2
+```
